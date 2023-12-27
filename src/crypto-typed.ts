@@ -1653,6 +1653,6 @@ module CryptoVERSION {
     }
 }
 
-var benchmark_fn = function() { CryptoVERSION.encrypt(); CryptoVERSION.decrypt(); };
-var setup_fn = undefined;
-var teardown_fn = undefined;
+export var benchmark_fn = function() { CryptoVERSION.encrypt(); CryptoVERSION.decrypt(); };
+export var setup_fn = undefined;
+export var teardown_fn = undefined;

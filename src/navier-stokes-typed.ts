@@ -428,12 +428,12 @@ module NavierStokes {
     }
 }
 
-var benchmark_fn = function () {
+export var benchmark_fn = function () {
     NavierStokes.setupNavierStokes();
     NavierStokes.runNavierStokes();
     NavierStokes.tearDownNavierStokes();
 };
-var setup_fn;
-var teardown_fn;
+export var setup_fn;
+export var teardown_fn;
 
  

@@ -751,6 +751,6 @@ module VERSION {
     }
 }
 
-var benchmark_fn = VERSION.RayTracer.renderScene;
-var setup_fn = undefined;
-var teardown_fn = undefined;
+export var benchmark_fn = VERSION.RayTracer.renderScene;
+export var setup_fn = undefined;
+export var teardown_fn = undefined;

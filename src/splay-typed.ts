@@ -392,10 +392,10 @@ module SplayVERSION {
     }
 }
 
-var benchmark_fn = function () { 
+export var benchmark_fn = function () { 
     SplayVERSION.SplaySetup();
     SplayVERSION.SplayRun();
     SplayVERSION.SplayTearDown(); 
 }              
-var setup_fn;
-var teardown_fn;
+export var setup_fn;
+export var teardown_fn;
