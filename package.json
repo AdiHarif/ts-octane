@@ -2,7 +2,7 @@
   "name": "ts-octane",
   "version": "1.0.0",
   "description": "",
-  "main": "run.js",
+  "main": "build/run.js",
   "scripts": {
     "build": "tsc",
     "start": "node build/run.js"
