@@ -33,7 +33,6 @@
 //
 // The benchmark was originally implemented in BCPL by
 // Martin Richards.
-///<reference path='rt.ts'/>
 module RichardsTYPEDVERSION {
     var COUNT = 1000;
 

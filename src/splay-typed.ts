@@ -33,7 +33,6 @@
 // also has to deal with a lot of changes to the large tree object
 // graph.
 
-///<reference path='rt.ts'/>
 module SplayVERSION {
 
     // Configuration.

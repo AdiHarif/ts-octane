@@ -23,7 +23,6 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-///<reference path='rt.ts'/>
 module NavierStokes {
     var solver:FluidField = null;
     var nsFrameCounter = 0;

@@ -28,7 +28,6 @@
  * All redistributions must retain an intact copy of this copyright notice
  * and disclaimer.
  */
-///<reference path='rt.ts'/>
 module CryptoVERSION {
     // Bits per digit
     var dbits:number;

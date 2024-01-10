@@ -14,7 +14,6 @@
 
 // Variable used to hold a number that can be used to verify that
 // the scene was ray traced correctly.
-///<reference path='rt.ts'/>
 module VERSION {
     export module RayTracer {
         var checkNumber:number=0;
