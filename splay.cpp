@@ -2,6 +2,9 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <cassert>
+
+#include "allocator.h"
 
 using namespace std;
 
@@ -9,7 +12,32 @@ class KeyNotFoundException: public exception {};
 class WrongTreeSizeException: public exception {};
 class TreeNotSortedException: public exception {};
 
-template <typename T>
+struct Payload {
+    virtual void recursiveTeardown() = 0;
+};
+
+struct BasicPayload: public Payload {
+    vector<int> array;
+    string s;
+
+    void recursiveTeardown() {
+        delete this;
+    }
+};
+
+struct CompoundPayload: public Payload {
+    Payload* left;
+    Payload* right;
+    
+    void recursiveTeardown() {
+        this->left->recursiveTeardown();
+        this->right->recursiveTeardown();
+        delete this;
+    }
+};
+
+//template <typename T>
+typedef Payload* T;
 class SplayTree {
 public:
     class SplayTreeNode {
@@ -36,21 +64,33 @@ public:
         }
 
 
-        void recursiveTeardown() {
+        void recursiveTeardown(Allocator<SplayTreeNode>* nodeAllocator) {
             if (this->left != nullptr) {
-                this->left->recursiveTeardown();
+                this->left->recursiveTeardown(nodeAllocator);
             }
             if (this->right != nullptr) {
-                this->right->recursiveTeardown();
+                this->right->recursiveTeardown(nodeAllocator);
             }
             this->value->recursiveTeardown();
-            delete this;
+            //delete this;
+            this->~SplayTreeNode();
+            nodeAllocator->deallocate(this);
+        }
+
+        ~SplayTreeNode() {
+            // assert(this->left == nullptr);
+            // assert(this->right == nullptr);
+            //this->value->recursiveTeardown();
         }
     };
+
 private:
     SplayTreeNode* root;
 
 public:
+
+    Allocator<SplayTreeNode>* nodeAllocator;
+
     SplayTree(): root(nullptr) {}
     ~SplayTree() {
         //this->root->recursiveTeardown();
@@ -63,14 +103,14 @@ public:
 
     void insert(double key, T value) {
         if (this->isEmpty()) {
-            this->root = new SplayTreeNode(key, value);
+            this->root = new (nodeAllocator->allocate()) SplayTreeNode(key, value);
             return;
         }
         this->splay(key);
         if (this->root->key == key) {
             return;
         }
-        SplayTreeNode* node = new SplayTreeNode(key, value);
+        SplayTreeNode* node = new (nodeAllocator->allocate()) SplayTreeNode(key, value);
         if (key > this->root->key) {
             node->left = this->root;
             node->right = this->root->right;
@@ -100,8 +140,9 @@ public:
             this->splay(key);
             this->root->right = right;
         }
-        //removed->value->recursiveTeardown();
         //delete removed;
+        removed->~SplayTreeNode();
+        nodeAllocator->deallocate(removed);
     }
 
     SplayTreeNode* find(double key) {
@@ -199,29 +240,6 @@ public:
     }
 };
 
-struct Payload {
-    virtual void recursiveTeardown() = 0;
-};
-
-struct BasicPayload: public Payload {
-    vector<int> array;
-    string s;
-
-    void recursiveTeardown() {
-        delete this;
-    }
-};
-
-struct CompoundPayload: public Payload {
-    Payload* left;
-    Payload* right;
-    
-    void recursiveTeardown() {
-        this->left->recursiveTeardown();
-        this->right->recursiveTeardown();
-        delete this;
-    }
-};
 
 Payload* generatePayloadTree(int depth, string tag) {
     if (depth == 0) {
@@ -236,7 +254,7 @@ Payload* generatePayloadTree(int depth, string tag) {
     return payload;
 }
 
-SplayTree<Payload*>* splayTree = nullptr;
+SplayTree* splayTree = nullptr;
 int kSplayTreeSize = 80000;
 int kSplayTreeModifications = 80;
 int kSplayTreePayloadDepth = 5;
@@ -258,7 +276,8 @@ double InsertNewNode() {
 }
 
 void splaySetup() {
-    splayTree = new SplayTree<Payload*>();
+    splayTree = new SplayTree();
+    splayTree->nodeAllocator = new Allocator<SplayTree::SplayTreeNode>(kSplayTreeSize + 1);
     for (int i = 0; i < kSplayTreeSize; i++) {
         InsertNewNode();
     }
@@ -271,12 +290,12 @@ void splayTearDown() {
 
     int length = keys.size();
     if (length != kSplayTreeSize) {
-        throw new WrongTreeSizeException();
+        throw WrongTreeSizeException();
     }
 
     for (int i = 0; i < length - 1; i++) {
         if (keys[i] >= keys[i + 1]) {
-            throw new TreeNotSortedException();
+            throw TreeNotSortedException();
         }
     }
 }
@@ -284,7 +303,7 @@ void splayTearDown() {
 void splayRun() {
     for (int i = 0; i < kSplayTreeModifications; i++) {
         double key = InsertNewNode();
-        SplayTree<Payload*>::SplayTreeNode* greatest = splayTree->findGreatestLessThan(key);
+        SplayTree::SplayTreeNode* greatest = splayTree->findGreatestLessThan(key);
         if (greatest == nullptr) {
             splayTree->remove(key);
         }
